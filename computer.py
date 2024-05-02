@@ -19,7 +19,7 @@ aclabel=Label(root,text="AC",font=newfont)                              #accumal
 aclabel.place(x=160,y=500)
 aclabelfram=LabelFrame(root,width=20)
 aclabelfram.place(x=210,y=503)
-acvalue="0000000000000000"
+acvalue="0000000000"
 label1=Label(aclabelfram,text=acvalue,font=newfont1)
 label1.pack()
 
@@ -61,7 +61,7 @@ arinputlabel.pack()
 
 drlabel=Label(root,text="DR",font=newfont)
 drlabel.place(x=160,y=620)
-drinput="0000000000000000"
+drinput="0000000000"
 drframe=LabelFrame(root,width=20)
 drframe.place(x=210,y=623)
 drinputlabel=Label(drframe,text=drinput,font=newfont1)
@@ -196,8 +196,12 @@ operand=[]
 variableoperand=[]
 fullinstruction=[]
 binaryinstruction=[]
+accumulator_entry=[]
 
-
+def multbinart(nuuuu):
+    mullll=int(nuuuu)
+    mulbinary=format(mullll,'032b')
+    return str(mulbinary)
 
 
 
@@ -233,6 +237,8 @@ def full_inc_fun(inc):
 
 
 
+pcvar=0
+mprlist=[]
 
 
 def instrc_load_in_memory():                                                    #instruction load manuplation
@@ -269,7 +275,7 @@ def instrc_load_in_memory():                                                    
             no=binarycon(xc)
             suboperandd=str(no)
             
-            subtext="000011"+suboperandd 
+            subtext="000100"+suboperandd 
             binaryinstruction.append(subtext)
             ramlabellist[memory_load_counter].config(text=subtext)
             memory_load_counter+=1
@@ -300,7 +306,7 @@ def instrc_load_in_memory():                                                    
             andoperand=str(no)
             andno=binarycon(xc)
             andoperand=str(andno)
-            andtext="000010"+andoperand
+            andtext="000011"+andoperand
             binaryinstruction.append(andtext)
             ramlabellist[memory_load_counter].config(text=andtext)
             memory_load_counter+=1
@@ -408,27 +414,126 @@ def instrc_load_in_memory():                                                    
           #  varno1=str(varno)
            # u+=1
             #ramlabellist[memory_load_counter].config(text=varno1)
-    pcinputlabel.config(text=binaryinstruction[0])        
+    pcinputlabel.config(text=opbinary(pcvar))        
             
-               
-
-def update_labels(index):
-    if index < len(binaryinstruction):
-        innnn = binaryinstruction[index]
-        irinputlabel.config(text=innnn)
-        
-        if index + 1 < len(innnn):
-            pcinputlabel.config(text=innnn[index + 1])
-        
-        # Schedule the next update after 1000 ms (1 second)
-        root.after(1000, update_labels, index + 1)
+stmmem=len(binaryinstruction)+1              
 
 def runbtnfun():
-    update_labels(0)
+    aaaaa=0
+    global stmmem
+    global pcvar
+    for index, innnn in enumerate(binaryinstruction):
+        if(innnn==None or innnn==0):
+            break
+        else:
+            bajwa=innnn[2:6]
+            bajwa1=innnn[6:]
+            root.after(1000,arinputlabel.config(text=opbinary(pcvar)))
+            
+            if aaaaa<len(binaryinstruction):
+                
+                pcvar+=1
+                root.after(1000,pcinputlabel.config(text=opbinary(pcvar)))
+                
         
+            irinputlabel.config(text=innnn)
+            aaaaa+=1
+
+            root.after(1000,drinputlabel.config(text=bajwa1))
+            
+            if(bajwa=="0000"):
+                root.after(1000,label1.config(text=bajwa1))
+                accumulator_entry.append(bajwa1)
+            print(bajwa)    
+            print(bajwa1)
+                
+            if(bajwa=="0010"):
+                print("called")
+                dec=int(accumulator_entry[-1],2)
+                dec1=int(bajwa1,2)
+                
+                dec2=dec+dec1
+                print(dec2)
+                dec3=binarycon(dec2)
+                print(dec3)
+                label1.config(text=dec3)
+                accumulator_entry.append(dec3)
+
+
+            if(bajwa=="0011"):
+                print("And called")
+                anddec=int(accumulator_entry[-1],2)
+                anddec1=int(bajwa1,2)
+                anddec2=anddec&anddec1
+                anddec3=binarycon(anddec2)
+                label1.config(text=anddec3)
+                accumulator_entry.append(anddec3)
+            if(bajwa=="0100"):
+                print("Sub called")
+                subdec=int(accumulator_entry[-1],2)
+                subdec1=int(bajwa1,2)
+                subdec2=subdec-subdec1
+                subdec3=binarycon(subdec2)
+                label1.config(text=subdec3)
+                accumulator_entry.append(subdec3)
+
+            if(bajwa=="0110"):
+                print("MULT called")
+                multdec=int(accumulator_entry[-1],2)
+                multdec1=int(bajwa1,2)
+                multdec3=multdec*multdec1
+                mult4=binarycon(multdec3)
+                
+                mprinputlabel.config(text=multbinart(multdec3))
+                mprlist.append(mult4)
+
+
+            if(bajwa=="0111"):
+                print("or called")
+                ordec=int(accumulator_entry[-1],2)
+                ordec1=int(bajwa1,2)
+                ordec3=ordec | ordec1
+                label1.config(text=binarycon(ordec3))
+                accumulator_entry.append(ordec3)    
+            if(bajwa=="1000"):
+                print("nor called")
+                nordec=int(accumulator_entry[-1],2)
+                nordec1=int(bajwa1,2)
+                nodec2=~(nordec|nordec1)
+                nordec3=binarycon(nodec2)
+                label1.config(text=nordec3)
+                accumulator_entry.append(nordec3)
+
+            if(bajwa=="1001"):
+                nanddec=int(accumulator_entry[-1],2)
+                nanddec1=int(bajwa1,2)
+                nanddec2=~(nanddec&nanddec1)
+                nanddec3=binarycon(nanddec2)
+                label1.config(text=nanddec3)
+                accumulator_entry.append(nanddec3)
+            if(bajwa=="0001"):
+                stdval=accumulator_entry[-1]
+                stddec1=int (bajwa1,2)
+                ramlabellist[stddec1].config(text="000000"+stdval)
+
+            if(bajwa=="1101"):
+                stmval=mprlist[-1]
+                stmvalhalf=stmval[0:15]
+                stmsecondhalf=stmval[16:31]
+                ramlabellist[stmmem].config(text=stmvalhalf)
+                ramlabellist[stmmem+1].config(text=stmsecondhalf)
 
 
 
+
+
+                
+
+
+
+                     
+
+            
             
 
 
